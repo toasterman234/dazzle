@@ -356,3 +356,190 @@ The spike has now proved that Dazzle can represent:
 It has **not** yet proved a live read-only SixB-to-Dazzle integration, persistence synchronization, API-pack compatibility, or native Dazzle enforcement of SixB's transition-request requirement payloads.
 
 Those are Phase 3 concerns.
+
+
+# Phase 3 evidence — live read-only SixB connection
+
+Date: 2026-10-05  
+Status: **Live read-only connection proved; combined DSL validation still pending**  
+Dazzle branch: `spike/sixb-atlas-dazzle-v0.1`
+
+## Live SixB API proof
+
+A committed GET-only probe:
+
+`spikes/sixb_atlas_dazzle/scripts/probe_live_sixb.py`
+
+was executed from exact Dazzle commit `92dce37d8de97da0e4350e962b86d3e3173e1430`.
+
+Control-plane run: `37349597528`.
+
+Result: **PASS**, exit code 0.
+
+Observed live SixB state:
+
+- `GET /health` -> 200, `{"status":"ok"}`;
+- `GET /ready` -> 200 with reachable storage and valid schema;
+- `GET /api/object-types/Work` -> 200;
+- `GET /api/object-types/RuntimeTransition` -> 200;
+- canonical Work `work/2026-10-04-sixb-master-work-model-runtime-v0.1` -> 200;
+- its live source-owned state was `in-progress`;
+- the live runtime currently contained 0 `RuntimeTransition` objects.
+
+The zero-transition result is current runtime state, not a failure of the API connection.
+
+## OpenAPI compatibility check
+
+Committed probe:
+
+`spikes/sixb_atlas_dazzle/scripts/probe_sixb_openapi.py`
+
+Control-plane run: `37350120243`.
+
+Result: **PASS** as a compatibility probe.
+
+SixB did **not** expose an OpenAPI/Swagger document at the tested conventional endpoints:
+
+- `/openapi.json` -> 404
+- `/api/openapi.json` -> 404
+- `/swagger.json` -> 404
+- `/api/swagger.json` -> 404
+
+`/docs` -> 200 HTML and identifies the service as the SixB API.
+
+Conclusion: Dazzle's automatic OpenAPI scaffold path cannot be used directly against the current SixB runtime.
+
+## Dazzle-native local API pack
+
+The spike now contains a project-local API pack:
+
+`spikes/sixb_atlas_dazzle/.dazzle/api_packs/sixb/sixb_local.toml`
+
+The pack is deliberately bounded to loopback SixB and declares only GET operations:
+
+- get one Work object;
+- list RuntimeTransition objects;
+- read the Work object type;
+- read the RuntimeTransition object type.
+
+It declares `auth.type = "none"` and contains no POST/PUT/PATCH/DELETE operation.
+
+Committed proof:
+
+`spikes/sixb_atlas_dazzle/scripts/prove_phase3_api_pack.py`
+
+The first live API-pack proof ran before the explicit no-auth declaration at commit `9ab4586b67292be48b80f98595c28e69bf96a79e`.
+
+Control-plane run: `37350819327`.
+
+Result: **PASS**, exit code 0.
+
+That proof established that Dazzle's project-local `api_kb` loader:
+
+- discovered the local `sixb_local` pack;
+- preserved the loopback SixB base URL;
+- loaded all four operations as GET-only;
+- generated Dazzle service/foreign-model DSL through the pack object;
+- fetched live SixB Work and object-type data;
+- read the canonical Work state as `in-progress`;
+- observed the live RuntimeTransition total as 0;
+- performed no SixB write-back.
+
+The pack has since been tightened to declare `auth.type = "none"`, and the proof script now asserts that no-auth profile explicitly.
+
+## Dazzle defects found while promoting the pack into combined DSL
+
+Three current Dazzle tooling inconsistencies were exposed by the spike. They are recorded as product/framework gaps rather than hidden with custom glue.
+
+### 1. Base-install API-pack CLI imports optional MCP
+
+Command:
+
+```bash
+uv run dazzle api-pack generate-dsl sixb_local --json
+```
+
+Control-plane run: `37350480647`.
+
+Result: **FAIL** in Dazzle CLI bootstrap:
+
+`ModuleNotFoundError: No module named 'mcp'`
+
+The API-pack CLI imports `dazzle.mcp.server.handlers.api_packs` even though `mcp` is an optional dependency. The underlying `dazzle.api_kb` loader/generator works without MCP, as proved above.
+
+### 2. Generated external service omitted required no-auth profile
+
+Combined validation run `37351048172` failed with:
+
+`Service must have auth_profile`
+
+The Dazzle parser requires every external API service to carry an auth profile. Dazzle's IR explicitly supports `AuthKind.NONE`.
+
+The pack was therefore corrected to declare:
+
+```toml
+[auth]
+type = "none"
+```
+
+and its DSL service now carries:
+
+```dsl
+auth_profile: none
+```
+
+### 3. API-pack foreign-model constraint generation does not match current parser
+
+The generated foreign-model DSL emitted `constraint cache`, but validation run `37351444321` reported that the active parser accepts only:
+
+- `read_only`
+- `event_driven`
+- `batch_import`
+
+Attempting the semantically correct `constraint read_only` then exposed a lexer/parser mismatch in run `37351697774`:
+
+`Expected IDENTIFIER, got read_only`
+
+Because the constraint is optional, the spike now omits it instead of patching Dazzle core. Read-only behavior remains enforced structurally by:
+
+1. foreign-model ownership semantics; and
+2. a project-local API pack containing GET operations only.
+
+## Current combined-DSL status
+
+The latest spike commit after removing the parser-broken optional foreign constraints is:
+
+`48e16610be5ad6f1cb87abd21b2930f246319247`
+
+A final Mac validation has **not yet completed** because an older control-plane lint run (`37351954287`) is stuck in-progress and currently occupies the single Mac runner lane. A checkout/validation request for the latest commit is queued behind it.
+
+Therefore the evidence boundary is intentionally precise:
+
+- live SixB API connection: **PROVED**
+- Dazzle-native local API-pack discovery/live reads: **PROVED**
+- SixB write-back: **NOT PRESENT**
+- authority transfer: **NOT PRESENT**
+- latest combined DSL parse/validation after the final normalization: **PENDING**
+
+## Phase 3 conclusion so far
+
+The important architectural question is answered positively:
+
+**Dazzle can sit beside the existing SixB runtime and consume its live object surface read-only without replacing SixB, sharing its database, or introducing a custom synchronization service.**
+
+The clean current shape is:
+
+```
+SixB runtime :3122
+  |
+  | GET only
+  v
+project-local Dazzle API pack (sixb_local)
+  |
+  v
+Dazzle foreign-model / semantic runtime
+```
+
+This is sufficient to keep SixB as the operational/source layer while testing Dazzle as a semantic/lifecycle/governance layer.
+
+No write path should be added until the combined DSL is green and a separate authority decision explicitly authorizes one.
