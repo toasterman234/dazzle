@@ -179,3 +179,180 @@ The next exploratory slice, if continued, is to map the rest of D-0028 lineage:
 `WorkProtocol -> WorkManifest -> Framework/Playbook/Template -> Work -> Lifecycle/Policy -> Run -> Evidence/VerificationEvidence -> RuntimeTransition`
 
 and compare Dazzle evaluation against the existing SixB fixtures while preserving source ownership.
+
+
+# Phase 2 evidence — D-0028 lineage + current D-0033 operational graph
+
+Date: 2026-10-05  
+Status: **Phase 2 parity proof passed; spike remains exploratory**  
+Dazzle branch: `spike/sixb-atlas-dazzle-v0.1`  
+Proved commit: `48d91c79c02c709394cec957f66a5606b9dbc742`
+
+## Exact execution boundary
+
+The exact branch head was fetched and verified in the governed Mac control plane, then executed from detached worktree:
+
+`/Users/bencharney/.control-plane/worktrees/wt-48d91c7-55b9bc3de889`
+
+Worktree run: `37348696757`.
+
+## Native Dazzle validation
+
+Command:
+
+```bash
+uv run dazzle validate -p spikes/sixb_atlas_dazzle
+```
+
+Control-plane run: `37348760478`.
+
+Result: **PASS**, exit code 0.
+
+The model now contains the D-0028 lineage slice plus the currently implemented D-0033 operational slice. Validation warnings remain intentionally non-blocking during this modeling spike:
+
+- no Dazzle RBAC policy has been invented for the source-derived entities;
+- no fitness `repr_fields` have been added;
+- no UI/kanban/timeline surfaces are being added merely to silence capability suggestions.
+
+## Native Dazzle lint
+
+Command:
+
+```bash
+uv run dazzle lint -p spikes/sixb_atlas_dazzle
+```
+
+Control-plane run: `37348915110`.
+
+Result: **PASS**, exit code 0.
+
+Warnings are modeling/presentation guidance rather than semantic failures, including unreferenced projection/history types, missing display fields, and the intentionally broad `RuntimeTransition` record.
+
+## D-0028 executable parity proof
+
+Committed proof:
+
+`spikes/sixb_atlas_dazzle/scripts/prove_phase2_d0028.py`
+
+Fixture:
+
+`spikes/sixb_atlas_dazzle/fixtures/d0028_parity.json`
+
+Command:
+
+```bash
+uv run python spikes/sixb_atlas_dazzle/scripts/prove_phase2_d0028.py
+```
+
+Control-plane run: `37348978460`.
+
+Result: **PASS**, exit code 0.
+
+Verified:
+
+- 15 D-0028 entities are present:
+  - WorkProtocol
+  - Framework
+  - Playbook
+  - Template
+  - Lifecycle
+  - LifecycleTransitionRule
+  - Policy
+  - Blocker
+  - VerificationEvidence
+  - WorkManifest
+  - Work
+  - Decision
+  - Evidence
+  - Run
+  - RuntimeTransition
+- all tested ref targets match the SixB source model;
+- the canonical lifecycle graph matches exactly after explicit identifier normalization:
+  - `in-progress -> in_progress`
+  - `changes-required -> changes_required`
+- native Dazzle legality matches SixB on the legal and illegal graph cases;
+- the SixB missing-requirements case produces exactly:
+  - `output`
+  - `run-or-change-record`
+- source authority remains unchanged:
+  - canonical Work state is source-owned;
+  - RuntimeTransition is an operational record;
+  - the Dazzle projection is not authoritative.
+
+### Explicit remaining D-0028 gap
+
+Dazzle natively enforces the **transition graph**.
+
+The SixB lifecycle's `requires` entries are currently transition-request inputs (for example `output`, `run-or-change-record`, `evidence`, `verifier`) rather than persistent Work fields. The spike therefore evaluates those requirements in the parity adapter instead of inventing fake Work properties solely to fit Dazzle's field-based transition guards.
+
+This is a real integration/design question for Phase 3, not a failed parity result.
+
+## Current D-0033 operational graph parity
+
+Committed proof:
+
+`spikes/sixb_atlas_dazzle/scripts/prove_phase2_d0033.py`
+
+Fixture:
+
+`spikes/sixb_atlas_dazzle/fixtures/d0033_graph_parity.json`
+
+Command:
+
+```bash
+uv run python spikes/sixb_atlas_dazzle/scripts/prove_phase2_d0033.py
+```
+
+Control-plane run: `37349032427`.
+
+Result: **PASS**, exit code 0.
+
+Mirrored current source entities:
+
+- Machine
+- Repository
+- Service
+- Tool
+- Capability
+
+Verified refs:
+
+- Service.runs_on -> Machine
+- Service.defined_by -> Repository
+- Tool.hosted_by -> Service
+- Capability.exposed_by -> Tool
+- Capability.targets -> Service
+
+The D-0030-authorized types `Agent`, `Skill`, and `Observation` are deliberately absent because the authoritative source revision does not yet implement them as ontology types. The spike does not invent them.
+
+The source also authorizes descriptive `Tool -> backedByProvider -> Provider` reuse, but the current Tool ontology at the proved source revision does not implement that relationship, so it is intentionally omitted here as well.
+
+## Phase 2 acceptance result
+
+| Criterion | Result |
+|---|---|
+| Latest combined DSL validates | PASS |
+| Latest combined DSL lints | PASS |
+| D-0028 entity/relationship parity | PASS |
+| D-0028 lifecycle graph parity | PASS |
+| D-0028 legal transition case | PASS |
+| D-0028 illegal transition case | PASS |
+| D-0028 missing-requirement case | PASS via parity adapter |
+| Current D-0033 implemented graph parity | PASS |
+| Unimplemented Agent/Skill/Observation invented | NO |
+| Source/master-repo authority changed | NO |
+| SixB write-back performed | NO |
+
+## Phase 2 conclusion
+
+Phase 2 is complete for the currently implemented authoritative source surface.
+
+The spike has now proved that Dazzle can represent:
+
+1. the governed D-0028 work/lifecycle/lineage model;
+2. the currently implemented Tool/Capability/Service operational graph;
+3. the lifecycle state graph using Dazzle's native runtime machinery.
+
+It has **not** yet proved a live read-only SixB-to-Dazzle integration, persistence synchronization, API-pack compatibility, or native Dazzle enforcement of SixB's transition-request requirement payloads.
+
+Those are Phase 3 concerns.
