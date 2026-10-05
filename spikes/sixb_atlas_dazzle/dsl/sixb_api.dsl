@@ -1,8 +1,9 @@
 module sixb_atlas.sixb_api
 
-# Derived from the project-local sixb_local API pack. Current Dazzle API-pack
-# generation emits legacy `constraint cache`; the active parser accepts
-# read_only/event_driven/batch_import, so this live bridge uses `read_only`.
+# Derived from the project-local sixb_local API pack. The current API-pack
+# generator/parser disagree on foreign constraint syntax, so this spike omits
+# optional constraints. Read-only is enforced by GET-only pack operations and
+# foreign_model semantics; no SixB mutation operation is declared.
 
 service sixblocal "SixB Local Runtime":
   spec: inline "pack:sixb_local"
@@ -11,22 +12,16 @@ service sixblocal "SixB Local Runtime":
 
 foreign_model SixbWorkObject from sixblocal "Read-only SixB Work object envelope; properties remain source-owned":
   key: primaryId
-  constraint read_only
-
   primaryId: str(500) required pk
   objectTypeId: str(100) required
   properties: json required
 
 foreign_model SixbRuntimeTransitionPage from sixblocal "Read-only page envelope for current SixB RuntimeTransition objects":
   key: total
-  constraint read_only
-
   total: int required pk
   objects: json required
 
 foreign_model SixbObjectType from sixblocal "Read-only SixB object-type description":
   key: id
-  constraint read_only
-
   id: str(100) required pk
   links: json required
