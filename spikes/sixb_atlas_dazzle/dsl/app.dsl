@@ -78,7 +78,7 @@ entity Policy "Policy":
   source_id: str(500) required unique
   title: str(300) required
   effect: str(100) required
-  scope: text required
+  policy_scope: text required
   source_ref: str(800) required
   provenance: str(500)
 
