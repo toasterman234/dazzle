@@ -199,3 +199,72 @@ entity RuntimeTransition "Runtime Transition":
   produced_run: ref Run
   produced_evidence: ref Evidence
   verified_by: ref VerificationEvidence
+
+# Current operational graph slice from authoritative master-repo @
+# 64e19ec47bdd2a1197ee7caaed4c1c0499488d5a.
+# D-0033 currently implements Tool + Capability over Service. Agent / Skill /
+# Observation are authorized by D-0030 but do not yet exist as ontology types
+# in this source revision, so this spike deliberately does not invent them.
+
+entity Machine "Machine":
+  id: uuid pk
+  source_id: str(500) required unique
+  hostname: str(300) required
+  os_name: str(200) required
+  architecture: str(100) required
+  source_ref: str(800) required
+  provenance: str(500)
+  observed_at: datetime required
+
+entity Repository "Repository":
+  id: uuid pk
+  source_id: str(500) required unique
+  full_name: str(500) required
+  profile: str(200)
+  status: str(100)
+  head_sha: str(128)
+  source_ref: str(800) required
+  provenance: str(500)
+  observed_at: datetime required
+
+entity Service "Service":
+  id: uuid pk
+  source_id: str(500) required unique
+  name: str(300) required
+  record_kind: str(100) required
+  status: str(100) required
+  origins: text
+  source_ref: str(800) required
+  provenance: str(500)
+  observed_at: datetime required
+  runs_on: ref Machine
+  defined_by: ref Repository
+
+entity Tool "Tool":
+  id: uuid pk
+  source_id: str(500) required unique
+  name: str(300) required
+  record_kind: str(100) required
+  endpoint: str(1000)
+  source_ref: str(800) required
+  provenance: str(500)
+  observed_at: datetime required
+  hosted_by: ref Service
+
+entity Capability "Capability":
+  id: uuid pk
+  source_id: str(500) required unique
+  name: str(300) required
+  integration: str(300) required
+  owner: str(500) required
+  provider_name: str(300)
+  identity_label: str(500)
+  last_health_status: str(100)
+  last_health_checked_at: datetime
+  status: str(100) required
+  source_ref: str(800) required
+  provenance: str(500)
+  observed_at: datetime required
+  exposed_by: ref Tool required
+  targets: ref Service
+
