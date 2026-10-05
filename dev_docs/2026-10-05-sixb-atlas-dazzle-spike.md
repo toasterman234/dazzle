@@ -196,20 +196,54 @@ Only if parity is good:
 
 ## Current state
 
-Phase 1 is now **verified on the bounded lifecycle slice** under `spikes/sixb_atlas_dazzle/`.
+Phase 1 and Phase 2 are now **verified** under `spikes/sixb_atlas_dazzle/`.
 
 Evidence is recorded in `spikes/sixb_atlas_dazzle/EVIDENCE.md`.
 
-Verified outcomes on 2026-10-05:
+### Phase 1
+
+The bounded lifecycle mechanism proof passed using Dazzle's native runtime validator.
+
+### Phase 2
+
+The latest proved Dazzle commit is:
+
+`48d91c79c02c709394cec957f66a5606b9dbc742`
+
+Verified on the governed Mac runner:
 
 - native `dazzle validate`: exit 0;
-- native `dazzle lint`: exit 0 on the DSL slice;
-- compiled AppSpec read-back shows the expected five-state Work machine;
-- Dazzle's runtime `TransitionValidator` allows `ready -> in_progress` and `in_progress -> verifying`;
-- it rejects `ready -> done` as an invalid transition;
-- it rejects `verifying -> done` without `verification_evidence`;
-- it allows `verifying -> done` when that evidence field is present.
+- native `dazzle lint`: exit 0;
+- D-0028 entity/relationship/lifecycle parity proof: PASS;
+- D-0033 current operational graph parity proof: PASS.
+
+The D-0028 model now includes the full tested lineage slice:
+
+`WorkProtocol -> WorkManifest -> Framework/Playbook/Template -> Work -> Lifecycle/Policy/Blocker -> Decision/Run -> Evidence/VerificationEvidence -> RuntimeTransition`
+
+The canonical lifecycle is represented exactly after explicit DSL-safe token normalization:
+
+- `in-progress -> in_progress`
+- `changes-required -> changes_required`
+
+The currently implemented D-0033 source surface is also mirrored:
+
+`Machine -> Service <- Tool <- Capability` plus `Repository -> Service` definition provenance.
+
+`Agent`, `Skill`, and `Observation` are **not** invented because the authoritative source revision has not yet implemented them as ontology types.
+
+One real design gap is now explicit: Dazzle natively validates transition graph legality, while SixB's lifecycle `requires` entries are transition-request inputs rather than persistent Work fields. Phase 2 evaluates those requirements in the parity adapter instead of creating fake fields.
 
 The spike remains exploratory. No SixB/master-repo authority was transferred and no source write-back was performed.
 
-The next gate is Phase 2 lineage/parity work; it is not implicitly approved by Phase 1 success.
+### Next gate — Phase 3
+
+Phase 3 may now explore a **read-only live connection**:
+
+1. use the existing loopback SixB API (`/api/objects`, `/api/object-types`) as the source surface;
+2. determine whether Dazzle's API-pack/OpenAPI path applies; current SixB proof code exposes REST endpoints but no project-local OpenAPI artifact has been identified yet;
+3. if API-pack cannot consume SixB directly, build only a thin read-only adapter/foreign-model bridge;
+4. prove live read-back of Work + RuntimeTransition first;
+5. do not add SixB write-back or authority mutation.
+
+No adoption decision is implied by entering Phase 3.
