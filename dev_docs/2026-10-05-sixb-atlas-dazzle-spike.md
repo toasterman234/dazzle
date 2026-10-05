@@ -236,17 +236,58 @@ One real design gap is now explicit: Dazzle natively validates transition graph 
 
 The spike remains exploratory. No SixB/master-repo authority was transferred and no source write-back was performed.
 
-### Next gate — Phase 3
+### Phase 3 — live read-only SixB connection
 
-Phase 3 may now explore a **read-only live connection**:
+Phase 3 has now proved the core connection path.
 
-1. use the existing loopback SixB API (`/api/objects`, `/api/object-types`) as the source surface;
-2. determine whether Dazzle's API-pack/OpenAPI path applies; current SixB proof code exposes REST endpoints but no project-local OpenAPI artifact has been identified yet;
-3. if API-pack cannot consume SixB directly, build only a thin read-only adapter/foreign-model bridge;
-4. prove live read-back of Work + RuntimeTransition first;
-5. do not add SixB write-back or authority mutation.
+Verified:
 
-No adoption decision is implied by entering Phase 3.
+1. the loopback SixB API is live at `http://127.0.0.1:3122`;
+2. Work and object-type endpoints are readable from the governed Dazzle spike;
+3. the canonical D-0028 Work currently reads `in-progress`;
+4. the live RuntimeTransition collection currently contains 0 objects;
+5. SixB does not currently publish OpenAPI/Swagger at the conventional endpoints;
+6. Dazzle discovers a project-local `sixb_local` API pack;
+7. that pack contains only GET operations and can read the live SixB surface;
+8. no SixB write-back or authority mutation exists.
+
+Current architecture under test:
+
+```
+SixB runtime :3122
+  |
+  | GET only
+  v
+Dazzle project-local API pack
+  |
+  v
+Dazzle foreign/domain model
+```
+
+This is preferable to building a custom sync layer for the spike.
+
+Three Dazzle tooling defects were also exposed and are documented in `EVIDENCE.md`:
+
+- the base-install `api-pack generate-dsl` command imports the optional MCP package;
+- generated no-auth service DSL initially omitted the parser-required `auth_profile`;
+- API-pack foreign-model constraint generation and the active parser/lexer disagree.
+
+The spike works around none of these with a bespoke runtime service. The local pack now declares `auth.type = "none"`, and optional foreign constraints are omitted while the operation surface remains GET-only.
+
+### Current gate
+
+The live connection itself is **proved**.
+
+The latest combined DSL commit is awaiting a final native `dazzle validate` after the last parser-compatible normalization. The single Mac runner lane is currently occupied by an older stuck lint run, so this final validation remains pending rather than being claimed as green.
+
+Until that completes:
+
+- keep the spike exploratory;
+- do not add write-back;
+- do not transfer authority;
+- do not expand into Agent/Skill/Observation unless SixB first implements those source types.
+
+No adoption decision is implied by Phase 3 success.
 
 ### Phase 3 current status
 
