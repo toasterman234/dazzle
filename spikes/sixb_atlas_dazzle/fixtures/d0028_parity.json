@@ -1,0 +1,224 @@
+{
+  "source": {
+    "repository": "toasterman234/master-repo",
+    "ref": "64e19ec47bdd2a1197ee7caaed4c1c0499488d5a",
+    "decision": "docs/decisions/D-0028-sixb-master-work-model-runtime-v0.1.md",
+    "work_item": "docs/work/2026-10-04-sixb-master-work-model-runtime-v0.1.md",
+    "lifecycle": "lifecycles/work-item.yaml"
+  },
+  "normalization": {
+    "proposed": "proposed",
+    "ready": "ready",
+    "in-progress": "in_progress",
+    "verification": "verification",
+    "accepted": "accepted",
+    "changes-required": "changes_required",
+    "blocked": "blocked",
+    "closed": "closed"
+  },
+  "lifecycle": {
+    "id": "lifecycle/work-item@0.1.0",
+    "version": "0.1.0",
+    "states": [
+      "proposed",
+      "ready",
+      "in-progress",
+      "verification",
+      "accepted",
+      "changes-required",
+      "blocked",
+      "closed"
+    ],
+    "transitions": [
+      {
+        "from": "proposed",
+        "to": "ready",
+        "requires": [
+          "parent",
+          "outcome",
+          "definition-of-done",
+          "owner"
+        ]
+      },
+      {
+        "from": "ready",
+        "to": "in-progress",
+        "requires": [
+          "authority-check"
+        ]
+      },
+      {
+        "from": "in-progress",
+        "to": "verification",
+        "requires": [
+          "output",
+          "run-or-change-record"
+        ]
+      },
+      {
+        "from": "in-progress",
+        "to": "blocked",
+        "requires": [
+          "blocker"
+        ]
+      },
+      {
+        "from": "verification",
+        "to": "accepted",
+        "requires": [
+          "evidence",
+          "verifier"
+        ]
+      },
+      {
+        "from": "verification",
+        "to": "changes-required",
+        "requires": [
+          "verification-findings"
+        ]
+      },
+      {
+        "from": "verification",
+        "to": "blocked",
+        "requires": [
+          "blocker"
+        ]
+      },
+      {
+        "from": "changes-required",
+        "to": "in-progress",
+        "requires": [
+          "updated-plan"
+        ]
+      },
+      {
+        "from": "accepted",
+        "to": "closed",
+        "requires": [
+          "result",
+          "current-state-update",
+          "downstream-work-captured"
+        ]
+      }
+    ],
+    "rules": {
+      "close_without_evidence": "forbidden",
+      "write_receipt_is_not_verification": true,
+      "unresolved_blocker_prevents_close": true
+    }
+  },
+  "canonical_hashes": {
+    "lifecycle": "59b94fe31e792cccc09659b125998d4ddb9d6534abf30fd56f59947a490fb954",
+    "template": "518f8934b47597e86d705f7247a2c7522507bbb3b187dfc49e2f1b9ff664a11b",
+    "protocol": "b2f24210babedf5515918cd4a62342efb39ab9663537c678b9dd462f03623ec6",
+    "framework": "ff9fa375ba1a7201dea3fde350da9b5cf51f22588b4abaf41980846a52ded634",
+    "playbook": "d47856bccbb6e4b4e53b031783b038bf508b66b92eb12de974198988df4c93f0"
+  },
+  "ids": {
+    "work": "work/2026-10-04-sixb-master-work-model-runtime-v0.1",
+    "decision": "decision/D-0028-sixb-master-work-model-runtime-v0.1",
+    "lifecycle": "lifecycle/work-item@0.1.0",
+    "template": "template/work-manifest@0.1.0",
+    "protocol": "work-protocol/governed-runtime-transition@0.1.0",
+    "framework": "framework/proof-local/deterministic-transition-evaluation@0.1.0",
+    "playbook": "playbook/proof-local/governed-transition-proof@0.1.0",
+    "manifest": "work-manifest/proof-local/sixb-master-work-model-runtime-proof@0.1.0",
+    "policy": "policy/proof-local/sixb-runtime-state-only"
+  },
+  "expected_entities": [
+    "WorkProtocol",
+    "Framework",
+    "Playbook",
+    "Template",
+    "Lifecycle",
+    "LifecycleTransitionRule",
+    "Policy",
+    "Blocker",
+    "VerificationEvidence",
+    "WorkManifest",
+    "Work",
+    "Decision",
+    "Evidence",
+    "Run",
+    "RuntimeTransition"
+  ],
+  "expected_refs": {
+    "WorkManifest": {
+      "initialized_by": "WorkProtocol",
+      "selects_framework": "Framework",
+      "selects_playbook": "Playbook",
+      "instantiated_from": "Template",
+      "lifecycle": "Lifecycle"
+    },
+    "Work": {
+      "described_by": "WorkManifest",
+      "governed_by_lifecycle": "Lifecycle",
+      "governing_policy": "Policy",
+      "blocker": "Blocker"
+    },
+    "Decision": {
+      "authorizes": "Work"
+    },
+    "Evidence": {
+      "evidences": "Work"
+    },
+    "Run": {
+      "run_of": "Work",
+      "used_manifest": "WorkManifest",
+      "initialized_by": "WorkProtocol",
+      "used_framework": "Framework",
+      "followed": "Playbook",
+      "instantiated_from": "Template",
+      "produced_evidence": "Evidence",
+      "verification_evidence": "VerificationEvidence"
+    },
+    "RuntimeTransition": {
+      "for_work": "Work",
+      "produced_run": "Run",
+      "produced_evidence": "Evidence",
+      "verified_by": "VerificationEvidence"
+    }
+  },
+  "sixb_proof_cases": [
+    {
+      "name": "missing-requirements",
+      "from": "in-progress",
+      "to": "verification",
+      "provided": [],
+      "expected": "blocked",
+      "missing": [
+        "output",
+        "run-or-change-record"
+      ]
+    },
+    {
+      "name": "legal-success",
+      "from": "in-progress",
+      "to": "verification",
+      "provided": [
+        "output",
+        "run-or-change-record"
+      ],
+      "expected": "allowed",
+      "missing": []
+    },
+    {
+      "name": "illegal-transition",
+      "from": "in-progress",
+      "to": "accepted",
+      "provided": [
+        "output",
+        "run-or-change-record",
+        "evidence",
+        "verifier"
+      ],
+      "expected": "illegal",
+      "missing": []
+    }
+  ],
+  "authority": {
+    "canonical_work_state_source_owned": true,
+    "runtime_transition_is_operational_record": true,
+    "dazzle_projection_authoritative": false
+  }
+}
