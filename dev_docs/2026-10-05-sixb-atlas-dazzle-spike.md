@@ -196,6 +196,20 @@ Only if parity is good:
 
 ## Current state
 
-Phase 1 scaffold started under `spikes/sixb_atlas_dazzle/`.
+Phase 1 is now **verified on the bounded lifecycle slice** under `spikes/sixb_atlas_dazzle/`.
 
-No claim of runtime success is made until Dazzle validation/runtime read-back is executed and recorded.
+Evidence is recorded in `spikes/sixb_atlas_dazzle/EVIDENCE.md`.
+
+Verified outcomes on 2026-10-05:
+
+- native `dazzle validate`: exit 0;
+- native `dazzle lint`: exit 0 on the DSL slice;
+- compiled AppSpec read-back shows the expected five-state Work machine;
+- Dazzle's runtime `TransitionValidator` allows `ready -> in_progress` and `in_progress -> verifying`;
+- it rejects `ready -> done` as an invalid transition;
+- it rejects `verifying -> done` without `verification_evidence`;
+- it allows `verifying -> done` when that evidence field is present.
+
+The spike remains exploratory. No SixB/master-repo authority was transferred and no source write-back was performed.
+
+The next gate is Phase 2 lineage/parity work; it is not implicitly approved by Phase 1 success.
