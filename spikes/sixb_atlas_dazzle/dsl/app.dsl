@@ -268,3 +268,111 @@ entity Capability "Capability":
   exposed_by: ref Tool required
   targets: ref Service
 
+# Explicit Phase 3 UI shell.
+# Public because this local personal spike has auth disabled in dazzle.toml.
+# This avoids relying on Dazzle's implicit/generated workspace selection.
+
+surface atlas_work_list "Work":
+  uses entity Work
+  mode: list
+  section main:
+    field title "Title"
+    field source_state "Canonical State"
+    field status "Dazzle State"
+    field record_kind "Kind"
+    field observed_at "Observed"
+    field source_ref "Source"
+
+surface atlas_transition_list "Runtime Transitions":
+  uses entity RuntimeTransition
+  mode: list
+  section main:
+    field work_id "Work"
+    field from_state "From"
+    field to_state "To"
+    field status "Status"
+    field legal "Legal"
+    field evaluation_reason "Reason"
+    field evaluated_at "Evaluated"
+
+surface atlas_evidence_list "Evidence":
+  uses entity Evidence
+  mode: list
+  section main:
+    field record_kind "Kind"
+    field summary "Summary"
+    field captured_at "Captured"
+    field source_ref "Source"
+
+surface atlas_tool_list "Tools":
+  uses entity Tool
+  mode: list
+  section main:
+    field name "Name"
+    field record_kind "Kind"
+    field endpoint "Endpoint"
+    field observed_at "Observed"
+
+surface atlas_capability_list "Capabilities":
+  uses entity Capability
+  mode: list
+  section main:
+    field name "Name"
+    field integration "Integration"
+    field provider_name "Provider"
+    field status "Status"
+    field last_health_status "Health"
+    field observed_at "Observed"
+
+surface atlas_service_list "Services":
+  uses entity Service
+  mode: list
+  section main:
+    field name "Name"
+    field record_kind "Kind"
+    field status "Status"
+    field observed_at "Observed"
+
+workspace atlas_home "Atlas":
+  purpose: "Public local dashboard for the SixB / Atlas Dazzle spike"
+  access: public
+  stage: "command_center"
+
+  work_board:
+    source: Work
+    display: kanban
+    group_by: status
+    empty: "No projected Work records are in Dazzle yet."
+
+  transitions:
+    source: RuntimeTransition
+    display: list
+    sort: evaluated_at desc
+    limit: 20
+    empty: "No RuntimeTransition records are in Dazzle yet."
+
+  evidence:
+    source: Evidence
+    display: list
+    sort: captured_at desc
+    limit: 20
+    empty: "No Evidence records are in Dazzle yet."
+
+  tools:
+    source: Tool
+    display: grid
+    sort: name asc
+    empty: "No Tool records are in Dazzle yet."
+
+  capabilities:
+    source: Capability
+    display: list
+    sort: name asc
+    empty: "No Capability records are in Dazzle yet."
+
+  services:
+    source: Service
+    display: list
+    sort: name asc
+    empty: "No Service records are in Dazzle yet."
+
