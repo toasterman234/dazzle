@@ -65,7 +65,7 @@ entity Lifecycle "Lifecycle":
 
 entity LifecycleTransitionRule "Lifecycle Transition Rule":
   id: uuid pk
-  lifecycle: ref Lifecycle required
+  lifecycle_ref: ref Lifecycle required
   from_state: str(100) required
   to_state: str(100) required
   normalized_from_state: str(100) required
@@ -113,7 +113,7 @@ entity WorkManifest "Work Manifest":
   selects_framework: ref Framework required
   selects_playbook: ref Playbook required
   instantiated_from: ref Template required
-  lifecycle: ref Lifecycle required
+  lifecycle_ref: ref Lifecycle required
 
 entity Work "Work":
   id: uuid pk
