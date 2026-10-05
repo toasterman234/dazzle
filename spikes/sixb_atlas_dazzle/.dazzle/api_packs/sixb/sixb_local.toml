@@ -40,7 +40,6 @@ description = "Get a SixbObjectType description for RuntimeTransition"
 [foreign_models.SixbWorkObject]
 description = "Read-only SixB Work object envelope; properties remain source-owned"
 key = "primaryId"
-cache_ttl = 5
 
 [foreign_models.SixbWorkObject.fields]
 primaryId = { type = "str(500)", required = true, pk = true }
@@ -50,7 +49,6 @@ properties = { type = "json", required = true }
 [foreign_models.SixbRuntimeTransitionPage]
 description = "Read-only page envelope for current SixB RuntimeTransition objects"
 key = "total"
-cache_ttl = 5
 
 [foreign_models.SixbRuntimeTransitionPage.fields]
 total = { type = "int", required = true, pk = true }
@@ -59,7 +57,6 @@ objects = { type = "json", required = true }
 [foreign_models.SixbObjectType]
 description = "Read-only SixB object-type description"
 key = "id"
-cache_ttl = 30
 
 [foreign_models.SixbObjectType.fields]
 id = { type = "str(100)", required = true, pk = true }
