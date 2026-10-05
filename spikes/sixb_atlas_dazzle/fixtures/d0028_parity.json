@@ -148,7 +148,7 @@
       "selects_framework": "Framework",
       "selects_playbook": "Playbook",
       "instantiated_from": "Template",
-      "lifecycle": "Lifecycle"
+      "lifecycle_ref": "Lifecycle"
     },
     "Work": {
       "described_by": "WorkManifest",
@@ -177,6 +177,9 @@
       "produced_run": "Run",
       "produced_evidence": "Evidence",
       "verified_by": "VerificationEvidence"
+    },
+    "LifecycleTransitionRule": {
+      "lifecycle_ref": "Lifecycle"
     }
   },
   "sixb_proof_cases": [
