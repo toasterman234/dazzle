@@ -247,3 +247,14 @@ Phase 3 may now explore a **read-only live connection**:
 5. do not add SixB write-back or authority mutation.
 
 No adoption decision is implied by entering Phase 3.
+
+### Phase 3 current status
+
+The live GET-only SixB connection has been proved and the project-local Dazzle API pack is implemented. No machine-readable OpenAPI document is exposed at the tested SixB paths, so the spike uses a bounded local API pack with read-only foreign models.
+
+The latest source also corrects a Dazzle API-pack generator/parser mismatch: generated legacy `constraint cache` is not accepted by the current parser, so this bridge uses native `constraint read_only` and removes local cache TTL metadata.
+
+Phase 3 is not yet accepted because the final fresh validation pass hit Mac disk exhaustion while uv was creating another temporary-worktree environment. This is an execution-environment blocker, not a semantic failure.
+
+The next action is strictly cleanup of control-plane-owned Dazzle verification worktrees, followed by one fresh validate/lint/live API-pack proof. No write-back or authority change is permitted.
+
