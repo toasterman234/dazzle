@@ -5,6 +5,7 @@ module sixb_atlas.sixb_api
 
 service sixblocal "SixB Local Runtime":
   spec: inline "pack:sixb_local"
+  auth_profile: none
   # Docs: http://127.0.0.1:3122/docs
 
 foreign_model SixbWorkObject from sixblocal "Read-only SixB Work object envelope; properties remain source-owned":
