@@ -94,7 +94,7 @@ entity Blocker "Blocker":
 entity VerificationEvidence "Verification Evidence":
   id: uuid pk
   source_id: str(500) required unique
-  kind: str(100) required
+  record_kind: str(100) required
   summary: text required
   captured_at: datetime required
   source_ref: str(800) required
@@ -119,7 +119,7 @@ entity Work "Work":
   id: uuid pk
   source_id: str(500) required unique
   title: str(300) required
-  kind: str(100) required
+  record_kind: str(100) required
   source_state: str(100) required
   status: enum[proposed,ready,in_progress,verification,accepted,changes_required,blocked,closed]=ready
   source_ref: str(800) required
@@ -155,7 +155,7 @@ entity Decision "Decision":
 entity Evidence "Evidence":
   id: uuid pk
   source_id: str(500) required unique
-  kind: str(100) required
+  record_kind: str(100) required
   summary: text required
   captured_at: datetime required
   source_ref: str(800) required
@@ -165,7 +165,7 @@ entity Evidence "Evidence":
 entity Run "Run":
   id: uuid pk
   source_id: str(500) required unique
-  kind: str(100) required
+  record_kind: str(100) required
   status: str(100) required
   started_at: datetime required
   finished_at: datetime
