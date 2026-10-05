@@ -42,8 +42,15 @@ def main() -> None:
 
     assert 'spec: inline "pack:sixb_local"' in service_dsl
     assert "auth_profile: none" in service_dsl
-    assert "foreign_model SixbWorkObject" in "\n".join(foreign_dsl)
-    assert "foreign_model SixbRuntimeTransitionPage" in "\n".join(foreign_dsl)
+    generated_foreign_dsl = "\n".join(foreign_dsl)
+    assert "foreign_model SixbWorkObject" in generated_foreign_dsl
+    assert "foreign_model SixbRuntimeTransitionPage" in generated_foreign_dsl
+    assert "constraint cache" not in generated_foreign_dsl, (
+        "current parser rejects legacy API-pack cache constraints"
+    )
+
+    committed_api_dsl = (ROOT / "dsl" / "sixb_api.dsl").read_text()
+    assert committed_api_dsl.count("constraint read_only") == 3
 
     work_path = operations["get_sixb_work_object"].path.replace(
         "{id}", urllib.parse.quote(WORK_ID, safe="")
