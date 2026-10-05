@@ -25,7 +25,7 @@ def main() -> None:
     pack = load_pack("sixb_local")
     assert pack is not None, "project-local sixb_local API pack was not discovered"
     assert pack.base_url == "http://127.0.0.1:3122"
-    assert pack.auth is None, "loopback proof pack must not invent auth"
+    assert pack.auth is not None and pack.auth.auth_type == "none"
     assert pack.operations, "pack must declare operations"
     assert all(op.method == "GET" for op in pack.operations), "pack must remain GET-only"
 
@@ -41,6 +41,7 @@ def main() -> None:
     foreign_dsl = [pack.generate_foreign_model_dsl(model) for model in pack.foreign_models]
 
     assert 'spec: inline "pack:sixb_local"' in service_dsl
+    assert "auth_profile: none" in service_dsl
     assert "foreign_model SixbWorkObject" in "\n".join(foreign_dsl)
     assert "foreign_model SixbRuntimeTransitionPage" in "\n".join(foreign_dsl)
 
@@ -75,7 +76,7 @@ def main() -> None:
             "name": pack.name,
             "provider": pack.provider,
             "base_url": pack.base_url,
-            "auth": None,
+            "auth": pack.auth.auth_type,
             "operations": [
                 {"name": op.name, "method": op.method, "path": op.path}
                 for op in pack.operations
