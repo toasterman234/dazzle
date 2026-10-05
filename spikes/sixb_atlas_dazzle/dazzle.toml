@@ -1,0 +1,13 @@
+[project]
+name = "sixb_atlas_dazzle"
+version = "0.1.0"
+root = "sixb_atlas.core"
+
+[modules]
+paths = ["./dsl"]
+
+[stack]
+name = "dnr"
+
+[auth]
+enabled = false

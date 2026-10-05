@@ -1,0 +1,56 @@
+{
+  "source": {
+    "repository": "toasterman234/master-repo",
+    "ref": "64e19ec47bdd2a1197ee7caaed4c1c0499488d5a",
+    "decision": "docs/decisions/D-0033-sixb-executor-tool-service-dual-model-v0.1.md",
+    "work_item": "docs/work/2026-10-05-sixb-executor-tool-service-v0.1.md"
+  },
+  "mirrored_entities": [
+    "Machine",
+    "Repository",
+    "Service",
+    "Tool",
+    "Capability"
+  ],
+  "implemented_d0030_types": [
+    "Tool",
+    "Capability"
+  ],
+  "authorized_but_not_implemented_in_source": [
+    "Agent",
+    "Skill",
+    "Observation"
+  ],
+  "expected_refs": {
+    "Service": {
+      "runs_on": "Machine",
+      "defined_by": "Repository"
+    },
+    "Tool": {
+      "hosted_by": "Service"
+    },
+    "Capability": {
+      "exposed_by": "Tool",
+      "targets": "Service"
+    }
+  },
+  "source_relationships": {
+    "Service.runsOn": "Machine",
+    "Service.definedBy": "Repository",
+    "Tool.hostedBy": "Service",
+    "Capability.exposedBy": "Tool",
+    "Capability.targets": "Service"
+  },
+  "authority": {
+    "descriptive_only": true,
+    "materialization_grants_execution_authority": false,
+    "executor_cloud_canonical_for_connection_inventory": true,
+    "master_repo_registry_canonical_for_services": true,
+    "dazzle_projection_authoritative": false
+  },
+  "omissions": {
+    "backedByProvider": "D-0033 authorizes descriptive reuse, but current source Tool ontology at this ref does not implement the link; omitted.",
+    "agent_chain": "Decision describes Agent -> Tool, but Agent ontology is not implemented at this ref; omitted.",
+    "observation": "Observation ontology is not implemented at this ref; omitted."
+  }
+}

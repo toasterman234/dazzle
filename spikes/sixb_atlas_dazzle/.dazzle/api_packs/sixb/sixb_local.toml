@@ -1,0 +1,63 @@
+# SixB Local Runtime API Pack
+# Phase 3 spike only: read-only loopback access to the existing SixB runtime.
+# No POST/PUT/PATCH/DELETE operations are declared.
+
+[pack]
+name = "sixb_local"
+provider = "SixB Local Runtime"
+category = "runtime"
+version = "0.1"
+description = "Read-only local SixB API used by the Atlas/Dazzle integration spike"
+base_url = "http://127.0.0.1:3122"
+docs_url = "http://127.0.0.1:3122/docs"
+
+[auth]
+type = "none"
+
+[infrastructure]
+hosting = "self_hosted"
+
+[operations.get_sixb_work_object]
+method = "GET"
+path = "/api/objects/Work/{id}"
+description = "Get a SixbWorkObject envelope by source-owned Work id"
+
+[operations.list_sixb_runtime_transition_page]
+method = "GET"
+path = "/api/objects?objectTypeId=RuntimeTransition&limit=200"
+description = "Get the SixbRuntimeTransitionPage for current RuntimeTransition objects"
+
+[operations.get_sixb_work_type]
+method = "GET"
+path = "/api/object-types/Work"
+description = "Get a SixbObjectType description for Work"
+
+[operations.get_sixb_runtime_transition_type]
+method = "GET"
+path = "/api/object-types/RuntimeTransition"
+description = "Get a SixbObjectType description for RuntimeTransition"
+
+[foreign_models.SixbWorkObject]
+description = "Read-only SixB Work object envelope; properties remain source-owned"
+key = "primaryId"
+
+[foreign_models.SixbWorkObject.fields]
+primaryId = { type = "str(500)", required = true, pk = true }
+objectTypeId = { type = "str(100)", required = true }
+properties = { type = "json", required = true }
+
+[foreign_models.SixbRuntimeTransitionPage]
+description = "Read-only page envelope for current SixB RuntimeTransition objects"
+key = "total"
+
+[foreign_models.SixbRuntimeTransitionPage.fields]
+total = { type = "int", required = true, pk = true }
+objects = { type = "json", required = true }
+
+[foreign_models.SixbObjectType]
+description = "Read-only SixB object-type description"
+key = "id"
+
+[foreign_models.SixbObjectType.fields]
+id = { type = "str(100)", required = true, pk = true }
+links = { type = "json", required = true }
