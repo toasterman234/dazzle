@@ -11,6 +11,9 @@ description = "Read-only local SixB API used by the Atlas/Dazzle integration spi
 base_url = "http://127.0.0.1:3122"
 docs_url = "http://127.0.0.1:3122/docs"
 
+[auth]
+type = "none"
+
 [infrastructure]
 hosting = "self_hosted"
 
