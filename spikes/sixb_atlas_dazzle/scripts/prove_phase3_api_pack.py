@@ -50,7 +50,12 @@ def main() -> None:
     )
 
     committed_api_dsl = (ROOT / "dsl" / "sixb_api.dsl").read_text()
-    assert committed_api_dsl.count("constraint read_only") == 3
+    assert "constraint cache" not in committed_api_dsl
+    assert "constraint read_only" not in committed_api_dsl, (
+        "current lexer rejects read_only in foreign constraint position; "
+        "read-only is enforced by foreign_model ownership plus GET-only operations"
+    )
+    assert committed_api_dsl.count("foreign_model ") == 3
 
     work_path = operations["get_sixb_work_object"].path.replace(
         "{id}", urllib.parse.quote(WORK_ID, safe="")
